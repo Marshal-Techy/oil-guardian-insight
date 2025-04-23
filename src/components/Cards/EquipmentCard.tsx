@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +23,8 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({
   isSelected = false,
   onClick
 }) => {
+  const navigate = useNavigate();
+
   const getStatusIndicator = () => {
     switch (status) {
       case 'healthy':
@@ -49,13 +52,20 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({
 
   const statusIndicator = getStatusIndicator();
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick(id);
+    }
+    navigate(`/equipment/${id}`);
+  };
+
   return (
     <Card 
       className={cn(
         "cursor-pointer transition-all duration-200 hover:shadow-md",
         isSelected ? "ring-2 ring-primary" : ""
       )}
-      onClick={() => onClick && onClick(id)}
+      onClick={handleClick}
     >
       <CardContent className="p-5">
         <div className="flex justify-between items-center mb-3">

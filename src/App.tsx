@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import AdminDashboard from "./pages/Dashboard/Admin";
 import OperatorDashboard from "./pages/Dashboard/Operator";
 import PredictiveMaintenance from "./pages/Dashboard/Predictive";
+import EquipmentDetails from "./pages/Dashboard/EquipmentDetails";
 import Alerts from "./pages/Alerts";
 import Industries from "./pages/Industries";
 import NotFound from "./pages/NotFound";
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/dashboard/admin" element={<AdminDashboard />} />
           <Route path="/dashboard/operator" element={<OperatorDashboard />} />
           <Route path="/dashboard/predictive" element={<PredictiveMaintenance />} />
+          <Route path="/equipment/:id" element={<EquipmentDetails />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/industries" element={<Industries />} />
           <Route path="*" element={<NotFound />} />
