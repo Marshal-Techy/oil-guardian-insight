@@ -1,45 +1,45 @@
-
-// Industries
+// Industries with more detailed descriptions
 export const industries = [
   { 
     id: 1, 
     name: "Oil & Gas", 
-    icon: "building", 
+    icon: "pipe", 
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    description: "Upstream and downstream monitoring"
+    description: "Pipeline integrity and leak detection systems"
   },
   { 
     id: 2, 
-    name: "Transport", 
-    icon: "building", 
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    description: "Fleet and infrastructure management"
+    name: "Construction", 
+    icon: "tank", 
+    image: "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    description: "Construction equipment monitoring"
   },
   { 
     id: 3, 
     name: "Agriculture", 
-    icon: "building", 
+    icon: "sliders-horizontal", 
     image: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    description: "Crop and equipment monitoring"
+    description: "Agricultural machinery monitoring"
   },
   { 
     id: 4, 
-    name: "Defense", 
-    icon: "building", 
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    description: "Secure field operations"
+    name: "Transport", 
+    icon: "sliders-vertical", 
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    description: "Fleet fuel system monitoring"
   },
   { 
     id: 5, 
-    name: "Construction", 
-    icon: "building", 
-    image: "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    description: "Site and equipment monitoring"
-  },
+    name: "Aero Defence", 
+    icon: "pipe", 
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    description: "Aircraft systems integrity monitoring"
+  }
 ];
 
-// Equipment for Oil & Gas
+// Updated equipment with industry-specific items
 export const equipment = [
+  // Oil & Gas Equipment
   { 
     id: 101, 
     industryId: 1, 
@@ -59,26 +59,114 @@ export const equipment = [
   { 
     id: 103, 
     industryId: 1, 
-    name: "Drilling Equipment", 
+    name: "Pressure Valves", 
     status: "alert", 
     lastMaintenance: "2025-02-10", 
     nextMaintenance: "2025-05-10"
   },
+
+  // Construction Equipment
   { 
-    id: 104, 
-    industryId: 1, 
-    name: "Pressure Valves", 
+    id: 201, 
+    industryId: 2, 
+    name: "Hydraulic Machines", 
     status: "healthy", 
-    lastMaintenance: "2025-03-28", 
-    nextMaintenance: "2025-06-28"
+    lastMaintenance: "2025-03-20", 
+    nextMaintenance: "2025-06-20"
   },
   { 
-    id: 105, 
-    industryId: 1, 
-    name: "Compressor Station", 
+    id: 202, 
+    industryId: 2, 
+    name: "Diesel Generators", 
     status: "warning", 
-    lastMaintenance: "2025-02-05", 
-    nextMaintenance: "2025-05-05"
+    lastMaintenance: "2025-02-15", 
+    nextMaintenance: "2025-05-15"
+  },
+  { 
+    id: 203, 
+    industryId: 2, 
+    name: "Fuel Storage Tanks", 
+    status: "healthy", 
+    lastMaintenance: "2025-03-10", 
+    nextMaintenance: "2025-06-10"
+  },
+
+  // Agriculture Equipment
+  { 
+    id: 301, 
+    industryId: 3, 
+    name: "Diesel Pumps", 
+    status: "healthy", 
+    lastMaintenance: "2025-03-25", 
+    nextMaintenance: "2025-06-25"
+  },
+  { 
+    id: 302, 
+    industryId: 3, 
+    name: "Oil Sprayers", 
+    status: "alert", 
+    lastMaintenance: "2025-02-20", 
+    nextMaintenance: "2025-05-20"
+  },
+  { 
+    id: 303, 
+    industryId: 3, 
+    name: "Tractors", 
+    status: "warning", 
+    lastMaintenance: "2025-03-05", 
+    nextMaintenance: "2025-06-05"
+  },
+
+  // Transport Equipment
+  { 
+    id: 401, 
+    industryId: 4, 
+    name: "Fuel Lines", 
+    status: "healthy", 
+    lastMaintenance: "2025-03-30", 
+    nextMaintenance: "2025-06-30"
+  },
+  { 
+    id: 402, 
+    industryId: 4, 
+    name: "Engines", 
+    status: "warning", 
+    lastMaintenance: "2025-02-25", 
+    nextMaintenance: "2025-05-25"
+  },
+  { 
+    id: 403, 
+    industryId: 4, 
+    name: "Storage Units", 
+    status: "healthy", 
+    lastMaintenance: "2025-03-01", 
+    nextMaintenance: "2025-06-01"
+  },
+
+  // Aero Defence Equipment
+  { 
+    id: 501, 
+    industryId: 5, 
+    name: "Aircraft Fuel Systems", 
+    status: "healthy", 
+    lastMaintenance: "2025-04-01", 
+    nextMaintenance: "2025-07-01"
+  },
+  { 
+    id: 502, 
+    industryId: 5, 
+    name: "Hydraulic Units", 
+    status: "alert", 
+    lastMaintenance: "2025-03-05", 
+    nextMaintenance: "2025-06-05"
+  },
+  { 
+    id: 503, 
+    industryId: 5, 
+    name: "Fuel Storage Tanks", 
+    status: "warning", 
+    lastMaintenance: "2025-03-15", 
+    nextMaintenance: "2025-06-15"
   }
 ];
 
