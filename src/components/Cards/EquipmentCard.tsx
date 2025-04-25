@@ -55,12 +55,10 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({
   const handleClick = () => {
     if (onClick) {
       onClick(id);
-    }
-    
-    // Use a small timeout to allow the onClick to complete first
-    setTimeout(() => {
+    } else {
+      // If no onClick handler is provided, just navigate
       navigate(`/equipment/${id}`);
-    }, 10);
+    }
   };
 
   return (

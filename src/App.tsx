@@ -12,6 +12,7 @@ import PredictiveMaintenance from "./pages/Dashboard/Predictive";
 import EquipmentDetails from "./pages/Dashboard/EquipmentDetails";
 import Alerts from "./pages/Alerts";
 import Industries from "./pages/Industries";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/equipment/:id" element={<EquipmentDetails />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/industries" element={<Industries />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

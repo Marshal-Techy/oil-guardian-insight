@@ -4,12 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logoutUser, getCurrentUser } from '@/lib/mockData';
-import { useToast } from '@/hooks/use-toast';
 
 const Header = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
-  const { toast } = useToast();
   
   const handleLogout = () => {
     logoutUser();
@@ -17,10 +15,7 @@ const Header = () => {
   };
   
   const handleSettings = () => {
-    toast({
-      title: "Settings",
-      description: "User settings functionality will be implemented soon.",
-    });
+    navigate('/settings');
   };
   
   const handleNotifications = () => {

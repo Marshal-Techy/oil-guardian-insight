@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { equipment, sensors } from '@/lib/mockData';
 import MainLayout from '@/components/Layout/MainLayout';
 import SensorGraph from '@/components/Charts/SensorGraph';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Timer, Settings, ChevronLeft } from 'lucide-react';
+import { Timer, Settings, ChevronLeft, Tool, Calendar, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
@@ -17,8 +17,83 @@ const EquipmentDetails = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('sensors');
   
+  // Find the equipment by ID
   const equipmentItem = equipment.find((item) => item.id === Number(id));
+  
+  // Get all sensors for this equipment
   const equipmentSensors = sensors.filter((sensor) => sensor.equipmentId === Number(id));
+
+  // Create static sensor data if none exists
+  const [enhancedSensors, setEnhancedSensors] = useState(equipmentSensors);
+  
+  useEffect(() => {
+    // If we don't have sensors for this equipment, create some demo data
+    if (equipmentSensors.length === 0 && equipmentItem) {
+      // Generate some demo sensor data based on equipment type
+      const demoSensors = [];
+      
+      // Create pressure sensor
+      demoSensors.push({
+        id: 10000 + Number(id),
+        equipmentId: Number(id),
+        name: `${equipmentItem.name} - Pressure`,
+        type: "pressure",
+        status: equipmentItem.status,
+        currentValue: equipmentItem.status === 'healthy' ? 65 : equipmentItem.status === 'warning' ? 78 : 92,
+        unit: "PSI",
+        threshold: 85,
+        historyData: generateDemoSensorData(40, 90, 24, equipmentItem.status),
+      });
+      
+      // Create temperature sensor
+      demoSensors.push({
+        id: 20000 + Number(id),
+        equipmentId: Number(id),
+        name: `${equipmentItem.name} - Temperature`,
+        type: "temperature",
+        status: equipmentItem.status,
+        currentValue: equipmentItem.status === 'healthy' ? 55 : equipmentItem.status === 'warning' ? 68 : 82,
+        unit: "°C",
+        threshold: 75,
+        historyData: generateDemoSensorData(30, 85, 24, equipmentItem.status),
+      });
+      
+      setEnhancedSensors(demoSensors);
+    }
+  }, [id, equipmentItem, equipmentSensors]);
+
+  // Generate demo sensor data
+  const generateDemoSensorData = (min, max, points, status) => {
+    const data = [];
+    const now = new Date();
+    
+    // Create a pattern based on status
+    const spike = status === 'alert' ? 0.8 : status === 'warning' ? 0.4 : 0.1;
+    
+    for (let i = points; i >= 0; i--) {
+      const time = new Date(now.getTime() - (i * 60 * 60 * 1000)); // hourly points
+      
+      // Create a normal pattern, with potential spikes based on status
+      let value;
+      if (status === 'alert' && (i === 2 || i === 8)) {
+        // Create spikes for alert status
+        value = Math.round(min + (max - min) * 0.9);
+      } else if (status === 'warning' && i === 5) {
+        // Create spike for warning status
+        value = Math.round(min + (max - min) * 0.75);
+      } else {
+        // Normal fluctuation
+        value = Math.round(min + Math.random() * (max - min) * (1 - spike));
+      }
+      
+      data.push({
+        time: time.toISOString(),
+        value
+      });
+    }
+    
+    return data;
+  };
 
   if (!equipmentItem) {
     return (
@@ -51,9 +126,13 @@ const EquipmentDetails = () => {
   };
 
   const handleSettingsClick = () => {
+    navigate('/settings');
+  };
+
+  const handleRequestMaintenance = () => {
     toast({
-      title: "Settings",
-      description: "Equipment settings functionality will be implemented soon.",
+      title: "Maintenance Requested",
+      description: `A maintenance request has been submitted for ${equipmentItem.name}.`,
     });
   };
 
@@ -89,6 +168,34 @@ const EquipmentDetails = () => {
           </div>
         </div>
 
+        {/* Status banner for warning or alert status */}
+        {equipmentItem.status !== 'healthy' && (
+          <Card className={cn(
+            "border-l-4",
+            equipmentItem.status === 'warning' ? "border-l-amber-500" : "border-l-red-500"
+          )}>
+            <CardContent className="flex items-center p-4 gap-2">
+              <AlertTriangle className={cn(
+                "h-5 w-5",
+                equipmentItem.status === 'warning' ? "text-amber-500" : "text-red-500"
+              )} />
+              <p className="font-medium">
+                {equipmentItem.status === 'warning' 
+                  ? "This equipment requires attention. Schedule maintenance soon."
+                  : "Critical issue detected! Immediate maintenance required."}
+              </p>
+              <div className="ml-auto">
+                <Button 
+                  variant={equipmentItem.status === 'alert' ? "destructive" : "outline"}
+                  onClick={handleRequestMaintenance}
+                >
+                  Request Maintenance
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList>
             <TabsTrigger value="sensors">Sensors</TabsTrigger>
@@ -96,15 +203,25 @@ const EquipmentDetails = () => {
           </TabsList>
           
           <TabsContent value="sensors" className="pt-4">
-            {equipmentSensors.length > 0 ? (
+            {enhancedSensors.length > 0 ? (
               <div className="grid gap-6">
-                {equipmentSensors.map((sensor) => (
+                {enhancedSensors.map((sensor) => (
                   <Card key={sensor.id} className="w-full">
                     <CardHeader>
-                      <CardTitle>{sensor.name}</CardTitle>
+                      <CardTitle className="flex items-center gap-2">
+                        <span className={cn(
+                          "h-3 w-3 rounded-full",
+                          sensor.status === 'healthy' ? "bg-green-500" :
+                          sensor.status === 'warning' ? "bg-amber-500" : "bg-red-500"
+                        )}></span>
+                        {sensor.name}
+                        <span className="ml-auto text-base font-normal">
+                          Current: <span className="font-bold">{sensor.currentValue} {sensor.unit}</span>
+                        </span>
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="h-[400px]">
+                      <div className="h-[300px]">
                         <SensorGraph 
                           sensorData={sensor.historyData || []}
                           threshold={sensor.threshold || 0}
@@ -130,11 +247,60 @@ const EquipmentDetails = () => {
           
           <TabsContent value="maintenance" className="pt-4">
             <Card>
-              <CardContent className="py-8">
-                <div className="flex flex-col items-center justify-center text-center space-y-3">
-                  <p className="text-xl font-medium">Maintenance History</p>
-                  <p className="text-muted-foreground">Last maintenance: {new Date(equipmentItem.lastMaintenance).toLocaleDateString()}</p>
-                  <p className="text-muted-foreground">Next scheduled: {new Date(equipmentItem.nextMaintenance).toLocaleDateString()}</p>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Tool className="h-5 w-5" />
+                  Maintenance History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">Last maintenance performed</p>
+                        <p className="text-muted-foreground">
+                          {new Date(equipmentItem.lastMaintenance).toLocaleDateString(undefined, { 
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <Button variant="outline">View Report</Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">Next scheduled maintenance</p>
+                        <p className="text-muted-foreground">
+                          {new Date(equipmentItem.nextMaintenance).toLocaleDateString(undefined, { 
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <Button variant="outline" onClick={handleRequestMaintenance}>
+                      Request Early Maintenance
+                    </Button>
+                  </div>
+                  
+                  <Card className="bg-muted/50">
+                    <CardHeader>
+                      <CardTitle className="text-base">Maintenance Records</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-center text-muted-foreground py-6">
+                        Detailed maintenance records will appear here
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               </CardContent>
             </Card>

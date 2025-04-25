@@ -10,11 +10,14 @@ interface SensorGraphProps {
 }
 
 const SensorGraph: React.FC<SensorGraphProps> = ({ sensorData, threshold, unit, status }) => {
-  // Handle empty data case
+  // Handle empty data case with more descriptive message
   if (!sensorData || sensorData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full text-muted-foreground">
-        No sensor data available
+      <div className="flex items-center justify-center h-full min-h-[200px] bg-gray-50 rounded-md border border-dashed border-gray-300 text-muted-foreground">
+        <div className="text-center">
+          <p>No sensor data available</p>
+          <p className="text-sm">Historical data will appear here once collected</p>
+        </div>
       </div>
     );
   }
@@ -38,7 +41,7 @@ const SensorGraph: React.FC<SensorGraphProps> = ({ sensorData, threshold, unit, 
   };
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height={300} className="mt-4">
       <LineChart
         data={sensorData}
         margin={{
