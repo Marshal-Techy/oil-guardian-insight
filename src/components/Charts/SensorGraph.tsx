@@ -10,9 +10,23 @@ interface SensorGraphProps {
 }
 
 const SensorGraph: React.FC<SensorGraphProps> = ({ sensorData, threshold, unit, status }) => {
+  // Handle empty data case
+  if (!sensorData || sensorData.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full text-muted-foreground">
+        No sensor data available
+      </div>
+    );
+  }
+  
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+    try {
+      const date = new Date(dateStr);
+      return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+    } catch (e) {
+      console.error("Error formatting date:", dateStr);
+      return "Invalid date";
+    }
   };
 
   const getChartColor = () => {

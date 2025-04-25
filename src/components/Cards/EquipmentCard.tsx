@@ -56,7 +56,11 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({
     if (onClick) {
       onClick(id);
     }
-    navigate(`/equipment/${id}`);
+    
+    // Use a small timeout to allow the onClick to complete first
+    setTimeout(() => {
+      navigate(`/equipment/${id}`);
+    }, 10);
   };
 
   return (

@@ -4,28 +4,41 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logoutUser, getCurrentUser } from '@/lib/mockData';
+import { useToast } from '@/hooks/use-toast';
 
 const Header = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
+  const { toast } = useToast();
   
   const handleLogout = () => {
     logoutUser();
     navigate('/login');
   };
   
+  const handleSettings = () => {
+    toast({
+      title: "Settings",
+      description: "User settings functionality will be implemented soon.",
+    });
+  };
+  
+  const handleNotifications = () => {
+    navigate('/alerts');
+  };
+  
   return (
     <header className="sticky top-0 z-30 h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex items-center justify-between h-full">
         <div className="flex items-center">
-          <h2 className="text-2xl font-bold text-primary">Oil Guardian</h2>
+          <h2 className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/')}>Oil Guardian</h2>
         </div>
         
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={handleNotifications}>
             <Bell className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={handleSettings}>
             <Settings className="h-5 w-5" />
           </Button>
           
