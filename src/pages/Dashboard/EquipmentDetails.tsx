@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { equipment, sensors } from '@/lib/mockData';
@@ -6,7 +5,7 @@ import MainLayout from '@/components/Layout/MainLayout';
 import SensorGraph from '@/components/Charts/SensorGraph';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Timer, Settings, ChevronLeft, Tool, Calendar, AlertTriangle } from 'lucide-react';
+import { Wrench, Settings, ChevronLeft, Calendar, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
@@ -17,22 +16,15 @@ const EquipmentDetails = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('sensors');
   
-  // Find the equipment by ID
   const equipmentItem = equipment.find((item) => item.id === Number(id));
-  
-  // Get all sensors for this equipment
   const equipmentSensors = sensors.filter((sensor) => sensor.equipmentId === Number(id));
 
-  // Create static sensor data if none exists
   const [enhancedSensors, setEnhancedSensors] = useState(equipmentSensors);
   
   useEffect(() => {
-    // If we don't have sensors for this equipment, create some demo data
     if (equipmentSensors.length === 0 && equipmentItem) {
-      // Generate some demo sensor data based on equipment type
       const demoSensors = [];
       
-      // Create pressure sensor
       demoSensors.push({
         id: 10000 + Number(id),
         equipmentId: Number(id),
@@ -45,7 +37,6 @@ const EquipmentDetails = () => {
         historyData: generateDemoSensorData(40, 90, 24, equipmentItem.status),
       });
       
-      // Create temperature sensor
       demoSensors.push({
         id: 20000 + Number(id),
         equipmentId: Number(id),
@@ -62,27 +53,21 @@ const EquipmentDetails = () => {
     }
   }, [id, equipmentItem, equipmentSensors]);
 
-  // Generate demo sensor data
   const generateDemoSensorData = (min, max, points, status) => {
     const data = [];
     const now = new Date();
     
-    // Create a pattern based on status
     const spike = status === 'alert' ? 0.8 : status === 'warning' ? 0.4 : 0.1;
     
     for (let i = points; i >= 0; i--) {
-      const time = new Date(now.getTime() - (i * 60 * 60 * 1000)); // hourly points
+      const time = new Date(now.getTime() - (i * 60 * 60 * 1000));
       
-      // Create a normal pattern, with potential spikes based on status
       let value;
       if (status === 'alert' && (i === 2 || i === 8)) {
-        // Create spikes for alert status
         value = Math.round(min + (max - min) * 0.9);
       } else if (status === 'warning' && i === 5) {
-        // Create spike for warning status
         value = Math.round(min + (max - min) * 0.75);
       } else {
-        // Normal fluctuation
         value = Math.round(min + Math.random() * (max - min) * (1 - spike));
       }
       
@@ -106,7 +91,6 @@ const EquipmentDetails = () => {
     );
   }
 
-  // Calculate operating time (mock data - in production this would come from the backend)
   const lastMaintenanceDate = new Date(equipmentItem.lastMaintenance);
   const now = new Date();
   const operatingHours = Math.floor((now.getTime() - lastMaintenanceDate.getTime()) / (1000 * 60 * 60));
@@ -168,7 +152,6 @@ const EquipmentDetails = () => {
           </div>
         </div>
 
-        {/* Status banner for warning or alert status */}
         {equipmentItem.status !== 'healthy' && (
           <Card className={cn(
             "border-l-4",
@@ -249,7 +232,7 @@ const EquipmentDetails = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Tool className="h-5 w-5" />
+                  <Wrench className="h-5 w-5" />
                   Maintenance History
                 </CardTitle>
               </CardHeader>
