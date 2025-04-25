@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
-import { industries, equipment } from '@/lib/mockData';
 import MainLayout from '@/components/Layout/MainLayout';
 import IndustryCard from '@/components/Cards/IndustryCard';
 import EquipmentCard from '@/components/Cards/EquipmentCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRealTimeData } from '@/hooks/useRealTimeData';
 
 const Industries = () => {
   const [selectedIndustry, setSelectedIndustry] = useState<number | null>(null);
+  const { industries, realTimeEquipment } = useRealTimeData();
   
-  // Get equipment for the selected industry
-  const filteredEquipment = equipment.filter(
+  const filteredEquipment = realTimeEquipment.filter(
     (item) => item.industryId === selectedIndustry
   );
   
@@ -26,7 +26,6 @@ const Industries = () => {
           <p className="text-muted-foreground">Manage and monitor all industries</p>
         </div>
         
-        {/* Industries Section */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle>All Industries</CardTitle>
@@ -49,7 +48,6 @@ const Industries = () => {
           </CardContent>
         </Card>
         
-        {/* Equipment Section (visible if an industry is selected) */}
         {selectedIndustry && (
           <Card>
             <CardHeader className="pb-3">
