@@ -170,8 +170,9 @@ export const equipment = [
   }
 ];
 
-// Sensors
+// Updated sensors array with data for all equipment
 export const sensors = [
+  // Oil & Gas Equipment Sensors
   {
     id: 1001,
     equipmentId: 101,
@@ -186,59 +187,128 @@ export const sensors = [
   {
     id: 1002,
     equipmentId: 101,
-    name: "Flow Rate Sensor F-101",
+    name: "Temperature Sensor T-101",
+    type: "temperature",
+    status: "healthy",
+    currentValue: 65,
+    unit: "°C",
+    threshold: 85,
+    historyData: generateSensorHistory(55, 75, 24),
+  },
+
+  // Construction Equipment Sensors
+  {
+    id: 2001,
+    equipmentId: 201,
+    name: "Hydraulic Pressure P-201",
+    type: "pressure",
+    status: "healthy",
+    currentValue: 2200,
+    unit: "PSI",
+    threshold: 2500,
+    historyData: generateSensorHistory(2000, 2400, 24),
+  },
+  {
+    id: 2002,
+    equipmentId: 201,
+    name: "Oil Temperature T-201",
+    type: "temperature",
+    status: "healthy",
+    currentValue: 82,
+    unit: "°C",
+    threshold: 95,
+    historyData: generateSensorHistory(75, 90, 24),
+  },
+
+  // Agriculture Equipment Sensors
+  {
+    id: 3001,
+    equipmentId: 301,
+    name: "Flow Rate F-301",
     type: "flow",
     status: "healthy",
     currentValue: 120,
     unit: "GPM",
-    threshold: 200,
+    threshold: 150,
     historyData: generateSensorHistory(100, 140, 24),
   },
   {
-    id: 1003,
-    equipmentId: 102,
-    name: "Level Sensor L-201",
-    type: "level",
-    status: "warning",
-    currentValue: 78,
-    unit: "%",
-    threshold: 80,
-    historyData: generateSensorHistory(65, 80, 24),
+    id: 3002,
+    equipmentId: 301,
+    name: "Pump Pressure P-301",
+    type: "pressure",
+    status: "healthy",
+    currentValue: 45,
+    unit: "PSI",
+    threshold: 60,
+    historyData: generateSensorHistory(35, 55, 24),
+  },
+
+  // Transport Equipment Sensors
+  {
+    id: 4001,
+    equipmentId: 401,
+    name: "Fuel Pressure P-401",
+    type: "pressure",
+    status: "healthy",
+    currentValue: 55,
+    unit: "PSI",
+    threshold: 70,
+    historyData: generateSensorHistory(45, 65, 24),
   },
   {
-    id: 1004,
-    equipmentId: 102,
-    name: "Temperature Sensor T-201",
+    id: 4002,
+    equipmentId: 401,
+    name: "Line Temperature T-401",
     type: "temperature",
     status: "healthy",
-    currentValue: 62,
+    currentValue: 45,
     unit: "°C",
-    threshold: 75,
-    historyData: generateSensorHistory(55, 68, 24),
+    threshold: 60,
+    historyData: generateSensorHistory(35, 55, 24),
+  },
+
+  // Aero Defence Equipment Sensors
+  {
+    id: 5001,
+    equipmentId: 501,
+    name: "System Pressure P-501",
+    type: "pressure",
+    status: "healthy",
+    currentValue: 3200,
+    unit: "PSI",
+    threshold: 3500,
+    historyData: generateSensorHistory(3000, 3400, 24),
   },
   {
-    id: 1005,
-    equipmentId: 103,
-    name: "Vibration Sensor V-301",
-    type: "vibration",
-    status: "alert",
-    currentValue: 42,
-    unit: "mm/s",
-    threshold: 30,
-    historyData: generateSensorHistory(20, 45, 24),
+    id: 5002,
+    equipmentId: 501,
+    name: "Fuel Temperature T-501",
+    type: "temperature",
+    status: "healthy",
+    currentValue: 35,
+    unit: "°C",
+    threshold: 45,
+    historyData: generateSensorHistory(25, 40, 24),
   },
-  {
-    id: 1006,
-    equipmentId: 103,
-    name: "RPM Sensor R-301",
-    type: "rpm",
-    status: "alert",
-    currentValue: 1850,
-    unit: "RPM",
-    threshold: 1800,
-    historyData: generateSensorHistory(1700, 1900, 24),
-  }
 ];
+
+// Helper function for generating sensor history data
+function generateSensorHistory(min, max, points) {
+  const data = [];
+  const now = new Date();
+  
+  for (let i = points; i >= 0; i--) {
+    const time = new Date(now.getTime() - (i * 60 * 60 * 1000)); // hourly points
+    const value = Math.round(min + Math.random() * (max - min));
+    data.push({
+      time: time.toISOString(),
+      value
+    });
+  }
+  
+  return data;
+}
 
 // Alerts
 export const alerts = [
@@ -340,23 +410,6 @@ export const predictiveAnalytics = [
     downtimeCost: "$22,000/day"
   }
 ];
-
-// Helper to generate random sensor data history
-function generateSensorHistory(min, max, points) {
-  const data = [];
-  const now = new Date();
-  
-  for (let i = points; i >= 0; i--) {
-    const time = new Date(now.getTime() - (i * 60 * 60 * 1000)); // hourly points
-    const value = Math.round(min + Math.random() * (max - min));
-    data.push({
-      time: time.toISOString(),
-      value
-    });
-  }
-  
-  return data;
-}
 
 // User authentication
 export const users = [
