@@ -8,22 +8,37 @@ export const useRealTimeData = () => {
 
   useEffect(() => {
     const updateData = () => {
-      // Update equipment status randomly
+      // Update equipment status with lower probability of changes
       const updatedEquipment = equipment.map(item => ({
         ...item,
-        status: Math.random() > 0.8 ? 'warning' : Math.random() > 0.95 ? 'alert' : 'healthy'
+        status: Math.random() > 0.9 ? 'warning' : Math.random() > 0.97 ? 'alert' : 'healthy'
       }));
 
-      // Update sensor values
+      // Update sensor values with smoother transitions
       const updatedSensors = sensors.map(sensor => {
-        const baseValue = sensor.type === 'temperature' ? 60 : 70;
-        const variation = Math.random() * 20 - 10;
+        // Get the last value or set a default
+        const lastValue = sensor.historyData.length > 0 
+          ? sensor.historyData[sensor.historyData.length - 1].value 
+          : (sensor.type === 'temperature' ? 60 : 70);
+        
+        // Create a smoother transition - max change of ±2 units per second
+        const maxChange = 2;
+        const change = (Math.random() * maxChange * 2) - maxChange;
+        
+        // Set base values according to sensor type
+        const baseValue = sensor.type === 'temperature' 
+          ? Math.min(Math.max(lastValue + change, 40), 80) // Keep temperature between 40-80
+          : Math.min(Math.max(lastValue + change, 50), 90); // Keep pressure between 50-90
+        
+        // Round to one decimal place for smoother visualization
+        const newValue = Math.round(baseValue * 10) / 10;
+
         return {
           ...sensor,
-          currentValue: Math.round(baseValue + variation),
+          currentValue: newValue,
           historyData: [
-            ...sensor.historyData.slice(1),
-            { time: new Date().toISOString(), value: Math.round(baseValue + variation) }
+            ...sensor.historyData.slice(-23), // Keep only the last 23 points
+            { time: new Date().toISOString(), value: newValue }
           ]
         };
       });
@@ -32,6 +47,7 @@ export const useRealTimeData = () => {
       setRealTimeSensors(updatedSensors);
     };
 
+    // Set the interval to exactly 1 second (1000ms)
     const interval = setInterval(updateData, 1000);
     return () => clearInterval(interval);
   }, []);

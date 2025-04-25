@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer } from 'recharts';
 
@@ -22,6 +21,9 @@ const SensorGraph: React.FC<SensorGraphProps> = ({ sensorData, threshold, unit, 
     );
   }
   
+  // Only use the last 24 data points to keep the graph clean
+  const displayData = sensorData.length > 24 ? sensorData.slice(-24) : sensorData;
+  
   const formatDate = (dateStr: string) => {
     try {
       const date = new Date(dateStr);
@@ -40,10 +42,15 @@ const SensorGraph: React.FC<SensorGraphProps> = ({ sensorData, threshold, unit, 
     }
   };
 
+  // Calculate min/max for y-axis to prevent wild jumps
+  const values = displayData.map(d => d.value);
+  const minValue = Math.max(0, Math.min(...values) - 5);
+  const maxValue = Math.max(...values) + 5;
+
   return (
     <ResponsiveContainer width="100%" height={300} className="mt-4">
       <LineChart
-        data={sensorData}
+        data={displayData}
         margin={{
           top: 20,
           right: 30,
@@ -57,11 +64,13 @@ const SensorGraph: React.FC<SensorGraphProps> = ({ sensorData, threshold, unit, 
           tickFormatter={formatDate}
           stroke="#6b7280"
           tick={{ fontSize: 12 }}
+          interval="preserveStartEnd"
+          minTickGap={30}
         />
         <YAxis 
           stroke="#6b7280"
           tick={{ fontSize: 12 }}
-          domain={['auto', 'auto']}
+          domain={[minValue, maxValue]}
           label={{ 
             value: unit, 
             angle: -90, 
@@ -73,10 +82,11 @@ const SensorGraph: React.FC<SensorGraphProps> = ({ sensorData, threshold, unit, 
           formatter={(value) => [`${value} ${unit}`, 'Value']}
           labelFormatter={(label) => new Date(label).toLocaleString()}
           contentStyle={{
-            backgroundColor: 'white',
-            border: '1px solid #e5e7eb',
+            backgroundColor: '#1f2937', // Dark background for the tooltip
+            border: '1px solid #374151',
             borderRadius: '0.375rem',
             padding: '0.5rem',
+            color: '#f9fafb'
           }}
         />
         <ReferenceLine
@@ -95,7 +105,7 @@ const SensorGraph: React.FC<SensorGraphProps> = ({ sensorData, threshold, unit, 
           dataKey="value"
           stroke={getChartColor()}
           strokeWidth={2}
-          dot={{ stroke: getChartColor(), strokeWidth: 1, r: 3, fill: 'white' }}
+          dot={false} // Remove dots for cleaner appearance
           activeDot={{ r: 5, stroke: getChartColor(), strokeWidth: 1, fill: getChartColor() }}
         />
       </LineChart>
