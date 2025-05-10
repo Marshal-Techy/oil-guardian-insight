@@ -69,10 +69,10 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
     if (mapsLoaded && mapRef.current && !googleMapRef.current) {
       try {
         console.log("Creating map instance");
-        // Create the map
+        // Create the map centered on Northeast India
         googleMapRef.current = new google.maps.Map(mapRef.current, {
-          center: { lat: 30, lng: 0 },
-          zoom: 2,
+          center: { lat: 26.1158, lng: 91.7086 }, // Coordinates for Guwahati, a major city in Northeast India
+          zoom: 7, // Zoom level to show the Northeast India region
           styles: [
             { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
             { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
@@ -192,7 +192,7 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
   return (
     <Card className="border-none bg-gray-900 text-gray-100 h-full">
       <CardHeader className="pb-2">
-        <CardTitle>Equipment Map</CardTitle>
+        <CardTitle>Equipment Map - Northeast India</CardTitle>
       </CardHeader>
       <CardContent className="h-[calc(100%-60px)]">
         {mapError && (
