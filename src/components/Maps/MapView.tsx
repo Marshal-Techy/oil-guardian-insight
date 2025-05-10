@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -38,7 +39,8 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
     // Load Google Maps API script if it hasn't been loaded yet
     if (!document.querySelector('script[src*="maps.googleapis.com/maps/api"]')) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&libraries=places`;
+      // Remove the API key for development purposes
+      script.src = `https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onerror = () => {
