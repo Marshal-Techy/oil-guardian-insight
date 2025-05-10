@@ -2,13 +2,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MapPin } from 'lucide-react';
+import MapView from '@/components/Maps/MapView';
+import { useRealTimeData } from '@/hooks/useRealTimeData';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { realTimeEquipment } = useRealTimeData();
   
   return (
-    <div className="relative min-h-screen flex items-center">
+    <div className="relative min-h-screen flex flex-col">
       {/* Background Image */}
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
         style={{
@@ -18,8 +21,8 @@ const Index = () => {
       </div>
       
       {/* Content */}
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="max-w-3xl backdrop-blur-sm bg-white/10 p-8 rounded-lg border border-white/20">
+      <div className="container mx-auto px-6 relative z-10 flex-1 flex flex-col">
+        <div className="max-w-3xl backdrop-blur-sm bg-white/10 p-8 rounded-lg border border-white/20 mt-10">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
             AI-Powered Remote Monitoring & Predictive Maintenance
           </h1>
@@ -46,9 +49,22 @@ const Index = () => {
             </div>
           </div>
           
-          <Button size="lg" onClick={() => navigate('/login')} className="bg-primary hover:bg-primary/90">
-            Login to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <div className="flex flex-wrap gap-4">
+            <Button size="lg" onClick={() => navigate('/login')} className="bg-primary hover:bg-primary/90">
+              Login to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button size="lg" onClick={() => navigate('/map')} variant="outline" className="border-white/30 text-white hover:bg-white/20">
+              View Equipment Map <MapPin className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+        
+        {/* Preview Map */}
+        <div className="mt-8 mb-10 backdrop-blur-sm bg-white/5 p-6 rounded-lg border border-white/20">
+          <h2 className="text-2xl font-bold text-white mb-4">Live Equipment Monitoring</h2>
+          <div className="h-[400px]">
+            <MapView equipment={realTimeEquipment} />
+          </div>
         </div>
       </div>
     </div>

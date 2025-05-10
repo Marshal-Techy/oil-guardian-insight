@@ -1,8 +1,7 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { MapPin, AlertTriangle, Info } from 'lucide-react';
+import { MapPin, AlertTriangle } from 'lucide-react';
 
 // Declare google variable to avoid TypeScript errors
 declare global {
@@ -26,12 +25,14 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
   const googleMapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const [mapsLoaded, setMapsLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   // Initialize map when component mounts
   useEffect(() => {
     // Define the callback function that will be called when Maps API loads
     window.initMap = () => {
       setMapsLoaded(true);
+      console.log("Google Maps API loaded successfully");
     };
 
     // Load Google Maps API script if it hasn't been loaded yet
@@ -40,6 +41,10 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
       script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&libraries=places`;
       script.async = true;
       script.defer = true;
+      script.onerror = () => {
+        setMapError("Failed to load Google Maps API");
+        console.error("Google Maps API failed to load");
+      };
       document.head.appendChild(script);
       
       return () => {
@@ -53,57 +58,66 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
     } else {
       // Maps API already loaded
       setMapsLoaded(true);
+      console.log("Google Maps API was already loaded");
     }
   }, []);
 
   // Create map once maps are loaded
   useEffect(() => {
     if (mapsLoaded && mapRef.current && !googleMapRef.current) {
-      // Create the map
-      googleMapRef.current = new google.maps.Map(mapRef.current, {
-        center: { lat: 30, lng: 0 },
-        zoom: 2,
-        styles: [
-          { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-          { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-          { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-          {
-            featureType: "administrative.locality",
-            elementType: "labels.text.fill",
-            stylers: [{ color: "#d59563" }],
-          },
-          {
-            featureType: "poi",
-            elementType: "labels.text.fill",
-            stylers: [{ color: "#d59563" }],
-          },
-          {
-            featureType: "road",
-            elementType: "geometry",
-            stylers: [{ color: "#38414e" }],
-          },
-          {
-            featureType: "road",
-            elementType: "geometry.stroke",
-            stylers: [{ color: "#212a37" }],
-          },
-          {
-            featureType: "road",
-            elementType: "labels.text.fill",
-            stylers: [{ color: "#9ca5b3" }],
-          },
-          {
-            featureType: "water",
-            elementType: "geometry",
-            stylers: [{ color: "#17263c" }],
-          },
-          {
-            featureType: "water",
-            elementType: "labels.text.fill",
-            stylers: [{ color: "#515c6d" }],
-          }
-        ],
-      });
+      try {
+        console.log("Creating map instance");
+        // Create the map
+        googleMapRef.current = new google.maps.Map(mapRef.current, {
+          center: { lat: 30, lng: 0 },
+          zoom: 2,
+          styles: [
+            { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+            {
+              featureType: "administrative.locality",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#d59563" }],
+            },
+            {
+              featureType: "poi",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#d59563" }],
+            },
+            {
+              featureType: "road",
+              elementType: "geometry",
+              stylers: [{ color: "#38414e" }],
+            },
+            {
+              featureType: "road",
+              elementType: "geometry.stroke",
+              stylers: [{ color: "#212a37" }],
+            },
+            {
+              featureType: "road",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#9ca5b3" }],
+            },
+            {
+              featureType: "water",
+              elementType: "geometry",
+              stylers: [{ color: "#17263c" }],
+            },
+            {
+              featureType: "water",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#515c6d" }],
+            }
+          ],
+        });
+        console.log("Map instance created successfully");
+        updateMarkers();
+      } catch (error) {
+        console.error("Error creating map:", error);
+        setMapError("Error initializing map");
+      }
     }
   }, [mapsLoaded]);
 
@@ -120,6 +134,8 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
     markersRef.current = [];
     
     if (!googleMapRef.current) return;
+    
+    console.log(`Adding ${equipment.length} markers to map`);
     
     // Add markers for each equipment location
     equipment.forEach(item => {
@@ -156,6 +172,8 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
         markersRef.current.push(marker);
       }
     });
+    
+    console.log(`Added ${markersRef.current.length} markers to map`);
   };
   
   const getStatusColor = (status: string): string => {
@@ -170,11 +188,18 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
   };
 
   return (
-    <Card className="border-none bg-gray-900 text-gray-100">
+    <Card className="border-none bg-gray-900 text-gray-100 h-full">
       <CardHeader className="pb-2">
         <CardTitle>Equipment Map</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="h-[calc(100%-60px)]">
+        {mapError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{mapError}</AlertDescription>
+          </Alert>
+        )}
+
         {!equipment.some(item => item.latitude && item.longitude) && (
           <Alert variant="destructive" className="mb-4">
             <AlertTriangle className="h-4 w-4" />
@@ -201,8 +226,8 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
         
         <div 
           ref={mapRef} 
-          className="w-full h-[400px] rounded-md overflow-hidden"
-          style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}
+          className="w-full h-full rounded-md overflow-hidden"
+          style={{ border: '1px solid rgba(255, 255, 255, 0.1)', minHeight: '300px' }}
         ></div>
       </CardContent>
     </Card>
