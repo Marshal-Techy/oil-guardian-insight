@@ -1,8 +1,15 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MapPin, AlertTriangle, Info } from 'lucide-react';
+
+// Declare google variable to avoid TypeScript errors
+declare global {
+  interface Window {
+    initMap: () => void;
+  }
+}
 
 interface MapViewProps {
   equipment: Array<{
@@ -18,82 +25,95 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
+  const [mapsLoaded, setMapsLoaded] = useState(false);
 
+  // Initialize map when component mounts
   useEffect(() => {
-    // Load Google Maps API script
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-
-    script.onload = initMap;
-
-    return () => {
-      // Clean up the script when component unmounts
-      document.head.removeChild(script);
+    // Define the callback function that will be called when Maps API loads
+    window.initMap = () => {
+      setMapsLoaded(true);
     };
+
+    // Load Google Maps API script if it hasn't been loaded yet
+    if (!document.querySelector('script[src*="maps.googleapis.com/maps/api"]')) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+      
+      return () => {
+        // Clean up only if we added the script
+        const scriptTag = document.querySelector('script[src*="maps.googleapis.com/maps/api"]');
+        if (scriptTag) {
+          document.head.removeChild(scriptTag);
+        }
+        delete window.initMap;
+      };
+    } else {
+      // Maps API already loaded
+      setMapsLoaded(true);
+    }
   }, []);
 
+  // Create map once maps are loaded
   useEffect(() => {
-    // Update markers when equipment data changes
-    if (googleMapRef.current) {
+    if (mapsLoaded && mapRef.current && !googleMapRef.current) {
+      // Create the map
+      googleMapRef.current = new google.maps.Map(mapRef.current, {
+        center: { lat: 30, lng: 0 },
+        zoom: 2,
+        styles: [
+          { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+          { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+          { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+          {
+            featureType: "administrative.locality",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#d59563" }],
+          },
+          {
+            featureType: "poi",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#d59563" }],
+          },
+          {
+            featureType: "road",
+            elementType: "geometry",
+            stylers: [{ color: "#38414e" }],
+          },
+          {
+            featureType: "road",
+            elementType: "geometry.stroke",
+            stylers: [{ color: "#212a37" }],
+          },
+          {
+            featureType: "road",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#9ca5b3" }],
+          },
+          {
+            featureType: "water",
+            elementType: "geometry",
+            stylers: [{ color: "#17263c" }],
+          },
+          {
+            featureType: "water",
+            elementType: "labels.text.fill",
+            stylers: [{ color: "#515c6d" }],
+          }
+        ],
+      });
+    }
+  }, [mapsLoaded]);
+
+  // Update markers when equipment data changes
+  useEffect(() => {
+    if (mapsLoaded && googleMapRef.current) {
       updateMarkers();
     }
-  }, [equipment]);
+  }, [equipment, mapsLoaded]);
 
-  const initMap = () => {
-    if (!mapRef.current) return;
-    
-    // Create the map
-    googleMapRef.current = new google.maps.Map(mapRef.current, {
-      center: { lat: 30, lng: 0 },
-      zoom: 2,
-      styles: [
-        { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-        { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-        {
-          featureType: "administrative.locality",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#d59563" }],
-        },
-        {
-          featureType: "poi",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#d59563" }],
-        },
-        {
-          featureType: "road",
-          elementType: "geometry",
-          stylers: [{ color: "#38414e" }],
-        },
-        {
-          featureType: "road",
-          elementType: "geometry.stroke",
-          stylers: [{ color: "#212a37" }],
-        },
-        {
-          featureType: "road",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#9ca5b3" }],
-        },
-        {
-          featureType: "water",
-          elementType: "geometry",
-          stylers: [{ color: "#17263c" }],
-        },
-        {
-          featureType: "water",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#515c6d" }],
-        }
-      ],
-    });
-    
-    updateMarkers();
-  };
-  
   const updateMarkers = () => {
     // Clear existing markers
     markersRef.current.forEach(marker => marker.setMap(null));
