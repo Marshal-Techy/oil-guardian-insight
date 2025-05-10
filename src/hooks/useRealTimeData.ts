@@ -2,14 +2,22 @@
 import { useState, useEffect } from 'react';
 import { industries, equipment, sensors } from '@/lib/mockData';
 
+// Add location data to equipment
+const equipmentWithLocation = equipment.map(item => ({
+  ...item,
+  // Generate somewhat realistic coordinates distributed around the world
+  latitude: (Math.random() * 120) - 60, // Between -60 and 60
+  longitude: (Math.random() * 360) - 180, // Between -180 and 180
+}));
+
 export const useRealTimeData = () => {
-  const [realTimeEquipment, setRealTimeEquipment] = useState(equipment);
+  const [realTimeEquipment, setRealTimeEquipment] = useState(equipmentWithLocation);
   const [realTimeSensors, setRealTimeSensors] = useState(sensors);
 
   useEffect(() => {
     const updateData = () => {
       // Update equipment status with lower probability of changes
-      const updatedEquipment = equipment.map(item => ({
+      const updatedEquipment = equipmentWithLocation.map(item => ({
         ...item,
         status: Math.random() > 0.9 ? 'warning' : Math.random() > 0.97 ? 'alert' : 'healthy'
       }));
