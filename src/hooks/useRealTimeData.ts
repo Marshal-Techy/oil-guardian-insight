@@ -2,13 +2,39 @@
 import { useState, useEffect } from 'react';
 import { industries, equipment, sensors } from '@/lib/mockData';
 
-// Add location data to equipment
-const equipmentWithLocation = equipment.map(item => ({
-  ...item,
-  // Generate somewhat realistic coordinates distributed around the world
-  latitude: (Math.random() * 120) - 60, // Between -60 and 60
-  longitude: (Math.random() * 360) - 180, // Between -180 and 180
-}));
+// Add location data to equipment with Northeast India coordinates
+const equipmentWithLocation = equipment.map(item => {
+  // Northeast India states: Assam, Arunachal Pradesh, Manipur, Meghalaya, Mizoram, Nagaland, Tripura, Sikkim
+  // Generate coordinates only within Northeast India region (roughly)
+  // Latitude range: 22° to 29.5° N
+  // Longitude range: 88° to 97.5° E
+  const latitude = 22 + (Math.random() * 7.5); // Between 22°N and 29.5°N
+  const longitude = 88 + (Math.random() * 9.5); // Between 88°E and 97.5°E
+  
+  const state = generateNortheastState();
+  
+  return {
+    ...item,
+    latitude,
+    longitude,
+    location: `${state}, India`
+  };
+});
+
+// Helper function to generate a Northeast Indian state
+function generateNortheastState() {
+  const states = [
+    "Assam", 
+    "Arunachal Pradesh", 
+    "Manipur", 
+    "Meghalaya", 
+    "Mizoram", 
+    "Nagaland", 
+    "Tripura", 
+    "Sikkim"
+  ];
+  return states[Math.floor(Math.random() * states.length)];
+}
 
 export const useRealTimeData = () => {
   const [realTimeEquipment, setRealTimeEquipment] = useState(equipmentWithLocation);

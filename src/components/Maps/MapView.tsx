@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MapPin, AlertTriangle } from 'lucide-react';
 
@@ -18,6 +18,7 @@ interface MapViewProps {
     status: string;
     latitude: number;
     longitude: number;
+    location?: string;
   }>;
 }
 
@@ -115,6 +116,23 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
           ],
         });
         console.log("Map instance created successfully");
+        
+        // Add boundary rectangle for Northeast India
+        const northeastBoundary = new google.maps.Rectangle({
+          strokeColor: "#FFFFFF",
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: "#FFFFFF",
+          fillOpacity: 0,
+          map: googleMapRef.current,
+          bounds: {
+            north: 29.5,
+            south: 22.0,
+            east: 97.5,
+            west: 88.0,
+          }
+        });
+        
         updateMarkers();
       } catch (error) {
         console.error("Error creating map:", error);
@@ -142,36 +160,45 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
     // Add markers for each equipment location
     equipment.forEach(item => {
       if (item.latitude && item.longitude) {
-        // Create marker
-        const marker = new google.maps.Marker({
-          position: { lat: item.latitude, lng: item.longitude },
-          map: googleMapRef.current,
-          title: item.name,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: getStatusColor(item.status),
-            fillOpacity: 0.8,
-            strokeWeight: 2,
-            strokeColor: '#ffffff',
-          }
-        });
-        
-        // Add info window with equipment details
-        const infoWindow = new google.maps.InfoWindow({
-          content: `
-            <div style="color: #333; padding: 5px;">
-              <h3 style="margin: 0; font-weight: bold;">${item.name}</h3>
-              <p style="margin: 5px 0 0;">Status: ${item.status}</p>
-            </div>
-          `
-        });
-        
-        marker.addListener('click', () => {
-          infoWindow.open(googleMapRef.current, marker);
-        });
-        
-        markersRef.current.push(marker);
+        // Only add markers for locations in Northeast India
+        // Northeast India rough boundaries:
+        // Lat: 22° to 29.5° N, Long: 88° to 97.5° E
+        if (
+          item.latitude >= 22 && item.latitude <= 29.5 && 
+          item.longitude >= 88 && item.longitude <= 97.5
+        ) {
+          // Create marker
+          const marker = new google.maps.Marker({
+            position: { lat: item.latitude, lng: item.longitude },
+            map: googleMapRef.current,
+            title: item.name,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 10,
+              fillColor: getStatusColor(item.status),
+              fillOpacity: 0.8,
+              strokeWeight: 2,
+              strokeColor: '#ffffff',
+            }
+          });
+          
+          // Add info window with equipment details
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div style="color: #333; padding: 5px;">
+                <h3 style="margin: 0; font-weight: bold;">${item.name}</h3>
+                <p style="margin: 5px 0 0;">Status: ${item.status}</p>
+                <p style="margin: 5px 0 0;">Location: ${item.location || "Northeast India"}</p>
+              </div>
+            `
+          });
+          
+          marker.addListener('click', () => {
+            infoWindow.open(googleMapRef.current, marker);
+          });
+          
+          markersRef.current.push(marker);
+        }
       }
     });
     
@@ -193,6 +220,7 @@ const MapView: React.FC<MapViewProps> = ({ equipment }) => {
     <Card className="border-none bg-gray-900 text-gray-100 h-full">
       <CardHeader className="pb-2">
         <CardTitle>Equipment Map - Northeast India</CardTitle>
+        <CardDescription>Monitoring equipment across India's northeastern states</CardDescription>
       </CardHeader>
       <CardContent className="h-[calc(100%-60px)]">
         {mapError && (
