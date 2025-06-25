@@ -1,14 +1,11 @@
-👋 Welcome to My Project!
-📌 Project Overview
+ Welcome to My Project!
+ Project Overview
 This is a web application built using modern frontend technologies. It’s designed for speed, scalability, and a great developer experience.
 
-🔗 Live Preview:
-Click here to view the project
-
-🛠️ How to Run the Project Locally
+ How to Run the Project Locally
 To get this project up and running on your local machine, follow these steps:
 
-🔧 Prerequisites
+Prerequisites
 Make sure you have the following installed:
 
 Node.js (v16 or above recommended)
@@ -17,7 +14,7 @@ npm (comes with Node.js)
 
 You can use nvm to manage Node versions easily.
 
-🚀 Getting Started
+ Getting Started
 bash
 Copy
 Edit
@@ -34,7 +31,7 @@ npm install
 npm run dev
 The app should now be running at http://localhost:5173 (or whichever port Vite configures).
 
-📂 Project Structure
+ Project Structure
 This project is organized as follows:
 
 php
@@ -48,7 +45,7 @@ Edit
 ├── public/              # Static assets
 ├── index.html           # Main HTML template
 └── vite.config.ts       # Vite configuration
-🧰 Tech Stack
+Tech Stack
 React – UI library
 
 TypeScript – Type-safe JavaScript
@@ -59,7 +56,7 @@ Tailwind CSS – Utility-first CSS framework
 
 shadcn/ui – Accessible UI components
 
-🌍 Deployment
+Deployment
 You can host this project on any platform that supports static site deployment (e.g., Vercel, Netlify, GitHub Pages).
 
 To deploy:
@@ -72,6 +69,6 @@ Edit
 npm run build
 Deploy the contents of the dist/ folder to your hosting platform.
 
-🌐 Custom Domain Setup
+ Custom Domain Setup
 If you're deploying to a platform like Netlify or Vercel, connecting a custom domain is simple. Just head to your hosting provider’s dashboard and update the domain settings.
 
